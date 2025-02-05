@@ -23,13 +23,7 @@ The Apache container is based on ModSecurity v2.9.x for [better stability and pe
 
 ## Installation
 
-### 1. Add the Helm Repository (if applicable)
-```sh
-helm repo add modsecurity-crs-proxy repository: oci://registry-1.docker.io/phoenixmedia
-helm repo update
-```
-
-### 2. Install the Chart
+### 1. Install the Chart
 ```sh
 helm install --create-namespace -n your-namespace modsecurity-crs-proxy oci://registry-1.docker.io/phoenixmedia/modsecurity-crs-proxy --version 0.1.0 -f values.yaml
 ```
@@ -39,7 +33,7 @@ Alternatively, install with default settings:
 helm install --create-namespace -n your-namespace --set BACKEND=http://my-app-service modsecurity-crs-proxy oci://registry-1.docker.io/phoenixmedia/modsecurity-crs-proxy
 ```
 
-### 3. Verify Deployment
+### 2. Verify Deployment
 Check if the pods are running:
 ```sh
 kubectl get pods -n your-namespace
