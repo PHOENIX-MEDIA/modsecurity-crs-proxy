@@ -1,0 +1,25 @@
+{{- if and .Values.geoip.enabled .Values.geoip.persistence.enabled (not .Values.geoip.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.geoip.persistence.name }}
+  annotations: {{ toYaml .Values.geoip.persistence.annotations | nindent 4 }}
+  labels:
+    {{- include "modsecurity-crs-proxy.labels" . | nindent 4 }}
+    {{- range $key, $val := ($.Values.geoip.persistence.labels | default dict) }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+spec:
+  accessModes:
+    {{- if not (empty .Values.geoip.persistence.accessModes) }}
+    {{- range .Values.geoip.persistence.accessModes }}
+    - {{ . | quote }}
+      {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ required "Storage size is required." .Values.geoip.persistence.size | quote }}
+  {{- if .Values.geoip.persistence.storageClassName }}
+  storageClassName: {{ .Values.geoip.persistence.storageClassName }}
+  {{- end -}}
+{{- end -}}

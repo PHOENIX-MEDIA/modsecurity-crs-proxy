@@ -1,0 +1,17 @@
+apiVersion: v2
+version: 0.1.0
+appVersion: "4.11.0-apache-202502011102"
+name: modsecurity-crs-proxy
+description: A Helm chart for Kubernetes
+maintainers:
+  - name: PHOENIX MEDIA GmbH
+    url: https://www.phoenix-media.eu
+type: application
+keywords:
+  - modsecurity
+  - owasp
+  - owasp-crs
+  - waf
+  - web application firewall
+  - Phoenix
+home: https://github.com/PHOENIX-MEDIA/modsecurity-crs-proxy

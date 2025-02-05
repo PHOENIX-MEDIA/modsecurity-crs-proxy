@@ -1,0 +1,149 @@
+# Default values for modsecurity-crs-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: owasp/modsecurity-crs
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# IMPORTANT: set your backend service where the traffic should be forwarded to
+backend: "http://my-app.svc.cluster.local:80"
+
+# see https://github.com/coreruleset/modsecurity-crs-docker?tab=readme-ov-file#modsecurity-env-variables
+env:
+  - name: PORT
+    value: "8080"
+  - name: SERVER_TOKENS
+    value: ProductOnly
+  - name: MODSEC_RULE_ENGINE
+    value: "On"
+  - name: PARANOIA
+    value: "3"
+  - name: BLOCKING_PARANOIA
+    value: "3"
+  #- name: MODSEC_DEBUG_LOG
+  #  value: "/dev/stdout"
+  #- name: MODSEC_DEBUG_LOGLEVEL
+  #  value: "9"
+
+securityRules:
+  modsecurity-override.conf: |-
+    # Use this file if you need to override specific parts that are not in environment variables
+
+  REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf: |-
+    # The purpose of this file is to hold LOCAL exceptions for your site.  The
+    # types of rules that would go into this file are one where you want to
+    # short-circuit inspection and allow certain transactions to pass through
+    # inspection or if you want to alter rules that are applied.
+
+  RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf: |-
+    # The purpose of this file is to hold LOCAL exceptions for your site.
+    # The types of rules that would go into this file are one where you want
+    # to unconditionally disable rules or modify their actions during startup.
+
+annotations: {}
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 0
+  maxUnavailable: 1
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # limits:
+  #   cpu: 2000m
+  #   memory: 1024Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 75
+
+geoip:
+  enabled: false
+  downloadUrl: ""
+  downloadToken: ""
+  downloadCommand: ""
+
+  persistence:
+    enabled: true
+    name: geoip-database
+    existingClaim: ""
+    annotations: {}
+    labels: {}
+    size: 1Gi
+    storageClassName: "files"
+    accessModes:
+      - ReadWriteMany
+
+# Additional volumes on the output Deployment definition.
+volumes:
+  - name: security-rules
+    configMap:
+      name: security-rules
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+  - name: security-rules
+    mountPath: /etc/modsecurity.d/modsecurity-override.conf
+    subPath: modsecurity-override.conf
+  - name: security-rules
+    mountPath: /etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+    subPath: REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+  - name: security-rules
+    mountPath: /etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+    subPath: RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# extra K8s manifests to deploy
+extraObjects: []

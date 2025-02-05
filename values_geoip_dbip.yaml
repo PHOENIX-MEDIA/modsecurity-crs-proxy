@@ -1,0 +1,28 @@
+securityRules:
+  REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf: |-
+    # skip health check
+    SecRule REQUEST_URI "@streq /healthz" "id:10001,phase:1,pass,nolog,ctl:ruleEngine=Off"
+    
+    # GeoIP
+    SecGeoLookupDb /etc/modsecurity.d/geoip/geoip-country.mmdb
+    SecRule REMOTE_ADDR "@geoLookup" "phase:1,id:155,pass"
+
+geoip:
+  enabled: true
+  downloadUrl: "https://download.db-ip.com/free/dbip-country-lite-2025-02.mmdb.gz"
+
+  downloadCommand:
+      - sh
+      - -c
+      - >
+        if [ ! -f /geoip/geoip-country.mmdb ] || ! find /geoip/geoip-country.mmdb -mtime +7 -exec false {} +; then
+          echo "GeoIP database is missing or older than 7 days. Downloading new version...";
+          rm -f /geoip/geoip-country.mmdb;
+          curl --fail -o /geoip/geolite.gz "${GEOIP_DOWNLOAD_URL}" || exit 1;
+          gunzip /geoip/geolite.gz;
+          mv /geoip/geolite* /geoip/geoip-country.mmdb;
+          touch /geoip/geoip-country.mmdb;
+          echo "GeoIP has been updated.";
+        else
+          echo "GeoIP database is up to date.";
+        fi
