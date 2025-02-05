@@ -29,10 +29,10 @@ env:
     value: "3"
   - name: BLOCKING_PARANOIA
     value: "3"
-  #- name: MODSEC_DEBUG_LOG
-  #  value: "/dev/stdout"
-  #- name: MODSEC_DEBUG_LOGLEVEL
-  #  value: "9"
+#  - name: MODSEC_DEBUG_LOG
+#    value: "/dev/stdout"
+#  - name: MODSEC_DEBUG_LOGLEVEL
+#    value: "9"
 
 securityRules:
   modsecurity-override.conf: |-
