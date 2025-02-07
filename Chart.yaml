@@ -1,5 +1,5 @@
 apiVersion: v2
-version: 0.1.0
+version: 0.1.1
 appVersion: "4.11.0-apache-202502011102"
 name: modsecurity-crs-proxy
 description: A Helm chart for Kubernetes
