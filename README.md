@@ -67,6 +67,19 @@ backend: "http://my-app-service.svc.cluster.local:80"
 
 This ensures that ModSecurity processes traffic before reaching your backend services.
 
+
+### Disable disruptive action
+
+ModSecurity supports [three engine modes](https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-%28v2.x%29#secruleengine):
+"On", "Off" and "DetectionOnly". Modify the environment variable to change the setting:
+
+```yaml
+env:
+  - name: MODSEC_RULE_ENGINE
+    value: "DetectionOnly"
+```
+*Note: In order to modify a single environment variable you have to copy the whole env block from the `values.yaml`*
+
 ## Uninstallation
 To remove the Helm deployment, run:
 ```sh

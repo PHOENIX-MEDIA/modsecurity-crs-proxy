@@ -23,6 +23,7 @@ env:
     value: "8080"
   - name: SERVER_TOKENS
     value: ProductOnly
+  # set to "DetectionOnly" or "Off" to disable blocking
   - name: MODSEC_RULE_ENGINE
     value: "On"
   - name: PARANOIA
