@@ -45,6 +45,9 @@ securityRules:
     # short-circuit inspection and allow certain transactions to pass through
     # inspection or if you want to alter rules that are applied.
 
+    # skip health check
+    SecRule REQUEST_URI "@streq /healthz" "id:10001,phase:1,pass,nolog,ctl:ruleEngine=Off"
+
   RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf: |-
     # The purpose of this file is to hold LOCAL exceptions for your site.
     # The types of rules that would go into this file are one where you want
