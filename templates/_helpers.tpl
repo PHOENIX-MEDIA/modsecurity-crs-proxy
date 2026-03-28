@@ -49,3 +49,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "modsecurity-crs-proxy.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "modsecurity-crs-proxy.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "modsecurity-crs-proxy.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

@@ -33,6 +33,40 @@ Alternatively, install with default settings:
 helm install --create-namespace -n your-namespace --set BACKEND=http://my-app-service modsecurity-crs-proxy oci://registry-1.docker.io/phoenixmedia/modsecurity-crs-proxy
 ```
 
+#### OpenShift Deployment
+
+When deploying on **OpenShift**, additional configuration is required due to Security Context Constraints (SCCs). The ModSecurity container runs as a non-root user (UID 999), which requires binding the ServiceAccount to an appropriate SCC.
+
+**Prerequisites:**
+This chart automatically creates a ServiceAccount and configures the pod to run as UID 999. You only need to bind the ServiceAccount to a compatible SCC.
+
+**SCC Configuration:**
+After installing the chart, bind the ServiceAccount to the `nonroot-v2` SCC (or any SCC that allows running as UID 999):
+
+```sh
+# Get the ServiceAccount name (typically: <release-name>-modsecurity-crs-proxy)
+SA_NAME=$(kubectl get sa -n your-namespace -l app.kubernetes.io/name=modsecurity-crs-proxy -o jsonpath='{.items[0].metadata.name}')
+
+# Bind to nonroot-v2 SCC
+oc adm policy add-scc-to-user nonroot-v2 -z $SA_NAME -n your-namespace
+```
+
+Alternatively, if you know your release name:
+```sh
+oc adm policy add-scc-to-user nonroot-v2 -z modsecurity-crs-proxy -n your-namespace
+```
+
+**Security Context:**
+The chart is pre-configured with the following security settings for OpenShift compatibility:
+- `runAsUser: 999` - Runs as the httpd user
+- `runAsGroup: 999` - Uses the httpd group
+- `fsGroup: 999` - Sets filesystem permissions
+- `runAsNonRoot: true` - Enforces non-root execution
+- `allowPrivilegeEscalation: false` - Prevents privilege escalation
+- Drops all Linux capabilities for enhanced security
+
+These settings are defined in `values.yaml` and can be customized if needed.
+
 ### 2. Verify Deployment
 Check if the pods are running:
 ```sh
